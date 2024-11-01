@@ -59,6 +59,18 @@ Spring을 이용하여 일정을 관리할 수 있는 앱 서버 구현
         <td>작성자 id</td>
       </tr>
       <tr>
+      	<td>name</td>
+        <td>String</td>
+        <td>필수</td>
+        <td>작성자 이름</td>
+      </tr>
+      <tr>
+      	<td>password</td>
+        <td>String</td>
+        <td>필수</td>
+        <td>작성자 비밀번호</td>
+      </tr>
+      <tr>
         <td>title</td>
         <td>String</td>
         <td>필수</td>
@@ -358,7 +370,7 @@ Spring을 이용하여 일정을 관리할 수 있는 앱 서버 구현
   {
     "name" : "숨염",
     "password" : "qwer!@#$",
-    "titme" : "11월 1일 데일리 스크럼!",
+    "title" : "11월 1일 데일리 스크럼!",
     "content" : "1. Spring 강의 듣기 | 2. Lv.0 과제 완료 | 3. 코드 카타 진행하기",
     "group" : "Spring 프로젝트"
   }
@@ -373,10 +385,16 @@ Spring을 이용하여 일정을 관리할 수 있는 앱 서버 구현
         <td>설명</td>
       </tr>
       <tr>
-      	<td>id</td>
+      	<td>name</td>
         <td>String</td>
         <td>필수</td>
-        <td>작성자 id</td>
+        <td>작성자 이름</td>
+      </tr>
+      <tr>
+      	<td>password</td>
+        <td>String</td>
+        <td>필수</td>
+        <td>작성자 비밀번호</td>
       </tr>
       <tr>
         <td>title</td>
