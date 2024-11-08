@@ -4,7 +4,7 @@ Spring을 이용하여 일정을 관리할 수 있는 앱 서버 구현
 
 ---
 ### 요구 사항 기능
-* Level 1
+* Level 1
     * 일정 생성 : 할일, 작성자명, 비밀번호, 작성/수정일 포함하여 일정 생성
     * 전체 일정 조회 : 수정일 또는 작성자명 기준으로 조회하거나 전체 일정 리스트 출력
     * 선택 일정 조회 : 선택한 일정 출력
@@ -28,7 +28,7 @@ Spring을 이용하여 일정을 관리할 수 있는 앱 서버 구현
 
 ---
 #### Trouble Shooting
-
+1. [Schedule Project](https://withsumyeom.tistory.com/entry/Trouble-Shooting-Schedule-Project)
 ---
 
 ## API 명세서
