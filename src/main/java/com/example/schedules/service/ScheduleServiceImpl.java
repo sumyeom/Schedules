@@ -73,7 +73,7 @@ public class ScheduleServiceImpl implements ScheduleService{
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
                 }
             }else{
-                //throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid password");
+
                 throw new CustomException(INVALID_PASSWORD);
             }
         }else{
@@ -91,7 +91,7 @@ public class ScheduleServiceImpl implements ScheduleService{
             if(user.getPassword().equals(password)){
                 int deletedRow = scheduleRepository.deleteSchedule(id);
                 if(deletedRow == 0){
-                    //throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+
                     throw new CustomException(SCHEDULE_NOT_FOUND);
                 }
             }else{

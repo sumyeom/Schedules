@@ -51,7 +51,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
 
     @Override
     public ScheduleResponseDto saveScheduleWithUser(Schedule schedule, User user) {
-        // 이메일을 사용하여 user 테이블에서 작성자 정보를 조회
+        // 이메일과 이름을 사용하여 user 테이블에서 작성자 정보를 조회
         String selectUserQuery = "SELECT * FROM user WHERE email = ? AND name = ?";
         User selectUser = jdbcTemplate.query(selectUserQuery, new Object[]{user.getEmail(), user.getName()}, rs -> {
             if (rs.next()) {
@@ -80,6 +80,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
             userUid = selectUser.getUid();
         }
 
+        // 해당 uid와 함께 schedule 테이블에 삽입
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("schedule").usingGeneratedKeyColumns("id");
 
@@ -98,14 +99,14 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
 
     @Override
     public List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String name) {
-        //String sql = "SELECT * FROM schedule WHERE (DATE(updated_date) = ? OR ? IS NULL) AND (user_name = ? OR ? IS NULL) ORDER BY updated_date DESC";
+        // schedule 테이블과 user테이블을 join하여 조회(schedule - updatedDate / user - name)
         String sql = "SELECT s.id, u.name, u.email, s.title, s.content, s.created_date, s.updated_date" +
                 " FROM schedule s" +
                 " JOIN user u ON s.uid = u.uid" +
                 " AND (DATE(s.updated_date) = ? OR ? IS NULL)" +
                 " AND (u.name = ? OR ? IS NULL)" +
                 " ORDER BY s.updated_date DESC";
-        // Optional 조건에 맞는 파라미터 설정
+
         return jdbcTemplate.query(
                 sql,
                 scheduleRowMapper(),
@@ -123,7 +124,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
     @Override
     public Schedule findScheduleByIdOrElseThrow(Long id) {
         List<Schedule> result = jdbcTemplate.query("SELECT * FROM schedule WHERE id = ?", scheduleRowMapperV2(), id);
-        //return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+
         return result.stream().findAny().orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
     }
 
@@ -154,7 +155,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
                 " JOIN user u ON s.uid = u.uid" +
                 " ORDER BY s.updated_date DESC" +
                 " LIMIT ? OFFSET ?";
-        // Optional 조건에 맞는 파라미터 설정
+
         return jdbcTemplate.query(
                 sql,
                 scheduleRowMapper(),
