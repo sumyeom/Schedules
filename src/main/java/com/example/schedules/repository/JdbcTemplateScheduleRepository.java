@@ -5,13 +5,11 @@ import com.example.schedules.dto.ScheduleResponseDto;
 import com.example.schedules.entity.Schedule;
 import com.example.schedules.entity.User;
 import com.example.schedules.exception.CustomException;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -23,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.example.schedules.exception.ErrorCode.SCHEDULE_NOT_FOUND;
+import static com.example.schedules.exception.ErrorCode.USER_NOT_FOUND;
 
 @Repository
 public class JdbcTemplateScheduleRepository implements ScheduleRepository{
@@ -98,19 +97,20 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
     }
 
     @Override
-    public List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String name) {
-        // schedule 테이블과 user테이블을 join하여 조회(schedule - updatedDate / user - name)
+    public List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String name, int page, int size) {
+        int offset = (page - 1) * size;
         String sql = "SELECT s.id, u.name, u.email, s.title, s.content, s.created_date, s.updated_date" +
                 " FROM schedule s" +
                 " JOIN user u ON s.uid = u.uid" +
                 " AND (DATE(s.updated_date) = ? OR ? IS NULL)" +
                 " AND (u.name = ? OR ? IS NULL)" +
-                " ORDER BY s.updated_date DESC";
+                " ORDER BY s.updated_date DESC" +
+                " LIMIT ? OFFSET ?";
 
         return jdbcTemplate.query(
                 sql,
                 scheduleRowMapper(),
-                updatedDate, updatedDate, name, name
+                updatedDate, updatedDate, name, name, size, offset
         );
     }
 
@@ -131,7 +131,7 @@ public class JdbcTemplateScheduleRepository implements ScheduleRepository{
     @Override
     public User findUserByUidOrElseThrow(String uid) {
         List<User> result = jdbcTemplate.query("SELECT * FROM user WHERE uid = ?", userRowMapper(), uid);
-        return result.stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist uid = " + uid));
+        return result.stream().findAny().orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
 
     @Override

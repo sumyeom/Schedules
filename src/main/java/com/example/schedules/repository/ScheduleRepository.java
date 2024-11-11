@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ScheduleRepository {
     ScheduleResponseDto savedSchedule(Schedule schedule, User user);
     ScheduleResponseDto saveScheduleWithUser(Schedule schedule, User user);
-    List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String userName);
+    List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String userName, int page, int size);
     Optional<Schedule> findScheduleById(Long id);
     Schedule findScheduleByIdOrElseThrow(Long id);
     User findUserByUidOrElseThrow(String uid);

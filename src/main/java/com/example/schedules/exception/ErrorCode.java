@@ -17,6 +17,7 @@ public enum ErrorCode {
 
     /* 404 일정 찾을 수 없음*/
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE_NOT_FOUN","해당 일정을 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUN","해당 작성자를 찾을 수 없습니다."),
 
     /* 500 내부 서버 오류 */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "내부 서버 오류가 발생했습니다.");

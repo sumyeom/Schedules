@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.schedules.exception.ErrorCode.INVALID_PASSWORD;
 import static com.example.schedules.exception.ErrorCode.SCHEDULE_NOT_FOUND;
@@ -39,22 +38,18 @@ public class ScheduleServiceImpl implements ScheduleService{
 
     @Transactional
     @Override
-    public List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String userName) {
-        List<ScheduleDetailResponseDto> allSchedules = scheduleRepository.findAllSchedules(updatedDate, userName);
+    public List<ScheduleDetailResponseDto> findAllSchedules(String updatedDate, String userName, int page, int size) {
+        List<ScheduleDetailResponseDto> allSchedules = scheduleRepository.findAllSchedules(updatedDate, userName, page, size);
         return allSchedules;
     }
 
     @Transactional
     @Override
     public ScheduleDetailResponseDto findScheduleById(Long id) {
-        Schedule schedule = scheduleRepository.findScheduleByIdOrElseThrow(id);
-        if(schedule!=null){
-            User user = scheduleRepository.findUserByUidOrElseThrow(schedule.getUid());
-            return new ScheduleDetailResponseDto(schedule,user);
-        }else {
-            throw new CustomException(SCHEDULE_NOT_FOUND);
-        }
-
+        Schedule schedule = scheduleRepository.findScheduleById(id)
+                .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
+        User user = scheduleRepository.findUserByUidOrElseThrow(schedule.getUid());
+        return new ScheduleDetailResponseDto(schedule, user);
     }
 
     @Transactional
@@ -63,44 +58,32 @@ public class ScheduleServiceImpl implements ScheduleService{
         if(userName == null || password == null || title == null || content == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The title and content are required values.");
         }
-        Optional<Schedule> schedule = scheduleRepository.findScheduleById(id);
-        if(!schedule.isEmpty()){
-            User user = scheduleRepository.findUserByUidOrElseThrow(schedule.get().getUid());
+        Schedule schedule = scheduleRepository.findScheduleById(id).orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
+        User user = scheduleRepository.findUserByUidOrElseThrow(schedule.getUid());
 
-            if(user.getPassword().equals(password)){
-                int updateRow = scheduleRepository.updateSchdule(id, title, content, user.getUid(), userName);
-                if(updateRow == 0){
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
-                }
-            }else{
-
-                throw new CustomException(INVALID_PASSWORD);
-            }
-        }else{
+        if(!user.getPassword().equals(password)) {
+            throw new CustomException(INVALID_PASSWORD);
+        }
+        int updateRow = scheduleRepository.updateSchdule(id, title, content, user.getUid(), userName);
+        if(updateRow == 0){
             throw new CustomException(SCHEDULE_NOT_FOUND);
         }
 
-        return new ScheduleResponseDto(schedule.get());
+        return new ScheduleResponseDto(schedule);
     }
 
     @Override
     public void deleteSchedule(Long id, String password) {
-        Optional<Schedule> schedule = scheduleRepository.findScheduleById(id);
-        if(!schedule.isEmpty()){
-            User user = scheduleRepository.findUserByUidOrElseThrow(schedule.get().getUid());
-            if(user.getPassword().equals(password)){
-                int deletedRow = scheduleRepository.deleteSchedule(id);
-                if(deletedRow == 0){
-
-                    throw new CustomException(SCHEDULE_NOT_FOUND);
-                }
-            }else{
-                throw new CustomException(INVALID_PASSWORD);
-            }
-        }else{
+        Schedule schedule = scheduleRepository.findScheduleById(id)
+                .orElseThrow(() -> new CustomException(SCHEDULE_NOT_FOUND));
+        User user = scheduleRepository.findUserByUidOrElseThrow(schedule.getUid());
+        if(!user.getPassword().equals(password)){
+            throw new CustomException(INVALID_PASSWORD);
+        }
+        int deletedRow = scheduleRepository.deleteSchedule(id);
+        if(deletedRow == 0){
             throw new CustomException(SCHEDULE_NOT_FOUND);
         }
-
     }
 
     @Override

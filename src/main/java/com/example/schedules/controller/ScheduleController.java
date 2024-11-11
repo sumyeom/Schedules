@@ -64,15 +64,17 @@ public class ScheduleController {
     public List<ScheduleDetailResponseDto> findAllSchedules(
             @RequestParam(required = false) String updatedDate,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam Map<String, String> allParams)
     {
         boolean invalidParams = allParams.keySet().stream()
-                .anyMatch(key -> !key.equals("updatedDate") && !key.equals("name"));
+                .anyMatch(key -> !key.equals("updatedDate") && !key.equals("name") && !key.equals("page") && !key.equals("size"));
 
         if (invalidParams) {
             throw new CustomException(INVALID_INPUT_PARAM);
         }
-        return scheduleService.findAllSchedules(updatedDate, name);
+        return scheduleService.findAllSchedules(updatedDate, name,page,size);
     }
 
     /**
@@ -113,20 +115,20 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * 메모 페이징 API
-     * @param page 페이지 번호
-     * @param size 페이지 사이즈
-     * @return {@link ResponseEntity<List<ScheduleDetailResponseDto>>} JSON 응답
-     */
-    @GetMapping("/pages")
-    public ResponseEntity<List<ScheduleDetailResponseDto>> getSchedulesPage(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ){
-        List<ScheduleDetailResponseDto> schedulePage = scheduleService.getSchedules(page,size);
-        return new ResponseEntity<>(schedulePage, HttpStatus.OK);
-    }
+//    /**
+//     * 메모 페이징 API
+//     * @param page 페이지 번호
+//     * @param size 페이지 사이즈
+//     * @return {@link ResponseEntity<List<ScheduleDetailResponseDto>>} JSON 응답
+//     */
+//    @GetMapping("/pages")
+//    public ResponseEntity<List<ScheduleDetailResponseDto>> getSchedulesPage(
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ){
+//        List<ScheduleDetailResponseDto> schedulePage = scheduleService.getSchedules(page,size);
+//        return new ResponseEntity<>(schedulePage, HttpStatus.OK);
+//    }
 
     /**
      * Error Message 바인딩 후 throw하는 메서드
